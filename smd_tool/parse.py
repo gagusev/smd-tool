@@ -1,5 +1,5 @@
 from typing import TextIO
-from smd_structs import *
+from .smd_structs import *
 
 class SMDContext:
 

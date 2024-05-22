@@ -1,4 +1,4 @@
-from parse import parseSMD
+from .parse import parseSMD
 from argparse import ArgumentParser, BooleanOptionalAction
 from os import path, chdir, listdir
 import pickle
