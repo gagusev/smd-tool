@@ -15,13 +15,21 @@ class SMDContext:
         self.in_nodes = False
         self.in_skeleton = True
 
+def findBone(id: int, bones: list[Bone]):
+    for bone in bones:
+        if bone.id == id:
+            return bone
+    return None
+
 def parseSMD(stream: TextIO):
 
     context = SMDContext()
+    time_oracle : int
 
     smd_version : int
     bones : list[Bone] = []
-    movements : list[Frame] = []
+    movements : list[Movement] = []
+    frames : list[Frame] = []
 
     for line in stream:
 
@@ -30,21 +38,35 @@ def parseSMD(stream: TextIO):
 
         tokens = line.split()
 
-        if context.in_nodes:
+        if tokens[0] == 'end':
+            if context.in_nodes:
+                context.setSkeleton()
+                continue
+            if context.in_skeleton:
+                frames.append(Frame(time_oracle, movements))
+                break
+
+        if context.in_nodes and tokens[0] != 'nodes':
             bones.append(Bone.load(tokens))
             continue
 
-        if context.in_skeleton:
-            movements.append(Movement.)
+        if context.in_skeleton and tokens[0] != 'skeleton':
+
+            if tokens[0] == 'time':
+                if not movements:
+                    pass
+                else: 
+                    frames.append(Frame(int(tokens[1])-1, movements))
+                    movements.clear()
+                    time_oracle = int(tokens[1])
+                continue
+
+            movements.append(Movement.load(findBone(int(tokens[0]), bones), tokens[1:]))
+            continue
 
         if tokens[0] == 'version':
             smd_version = int(tokens[1])
-            continue
-
-        if tokens[0] == 'nodes':
             context.setNodes()
             continue
 
-        if tokens[0] == 'skeleton':
-            context.setSkeleton()
-            continue
+    return SMD(smd_version, bones, frames)
