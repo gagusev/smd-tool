@@ -24,7 +24,7 @@ def findBone(id: int, bones: list[Bone]):
 def parseSMD(stream: TextIO):
 
     context = SMDContext()
-    time_oracle : int
+    time_oracle = 0
 
     smd_version : int
     bones : list[Bone] = []
